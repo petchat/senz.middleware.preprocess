@@ -4,8 +4,10 @@ __author__ = 'woodie, jiaying.lu'
 from flask import Flask, request, make_response
 import json
 import os
+from numpy import log
 
 from log2rawsenz import collect_senz_lists
+from prob2multi import prob2muti, prob2muti_quick
 from config import *
 
 import bugsnag
@@ -98,6 +100,60 @@ def senzCollectorAPI():
         return make_response(json.dumps(result), 500)
 
     logger.debug('<%s>, [log.rawsenz] result: %s' % (x_request_id, result['result']))
+    return json.dumps(result)
+
+
+@app.route('/prob2multi/', methods=['POST'])
+def senzListConverter():
+    logger.info('[Enter converter()] params: %s' % (request.data))
+    result = {'code':1, 'message':''}
+
+    if request.headers.has_key('X-Request-Id'):
+        x_request_id = request.headers['X-Request-Id']
+    else:
+        x_request_id = ''
+
+    # params JSON validate
+    try:
+        params = json.loads(request.data)
+    except ValueError, err_msg:
+        logger.error('<%s>, [ValueError] err_msg: %s, params=%s' % (x_request_id, err_msg, request.data))
+        result['message'] = 'Unvalid params: NOT a JSON Object'
+        result['code'] = 103
+        return make_response(json.dumps(result), 400)
+
+    # params key checking
+    try:
+        prob_senzlist = params['probSenzList']
+        strategy = params['strategy']
+        mutiSenzList_max_num = params.get('mutiMaxNum', 3)
+    except KeyError, err_msg:
+        logger.error("<%s>, [KeyError] can't find key=%s in params=%s" % (x_request_id, err_msg, params))
+        result['message'] = "Params content Error: cant't find key=%s" % (err_msg)
+        result['code'] = 103
+        return make_response(json.dumps(result), 400)
+
+    # 不同策略不同处理
+    if strategy == 'SELECT_MAX_PROB':
+        result['code'] = 0
+        result['message'] = 'success'
+        muti_senzlist = prob2muti(prob_senzlist, log(1e-30))
+        muti_senzlist = sorted(muti_senzlist, key=lambda elem: elem['prob'], reverse=True)
+        result['result'] = muti_senzlist[:mutiSenzList_max_num]
+    if strategy == 'SELECT_MAX_N_PROB':
+        result['code'] = 0
+        result['message'] = 'success'
+        muti_senzlist = prob2muti_quick(prob_senzlist, mutiSenzList_max_num, log(1e-30))
+        result['result'] = muti_senzlist
+    else:
+        logger.error('<%s>, [Input Error] strategy=%s should in ["SELECT_MAX_PROB", "SELECT_MAX_N_PROB"]'
+                      % (x_request_id, strategy))
+        result['message'] = 'strategy error'
+        result['code'] = 103
+        return make_response(json.dumps(result), 400)
+
+    logger.info('<%s>, [convert success] strategy:%s, code:%s, result:%s'
+                %(x_request_id, strategy, result['code'], result['result']))
     return json.dumps(result)
 
 

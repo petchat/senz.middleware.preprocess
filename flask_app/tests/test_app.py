@@ -9,16 +9,16 @@ from flask_app.app import app
 import json
 
 
-class TestSenzCollectorAPI(TestCase):
+class TestLog2RawsenzAPI(TestCase):
     url = '/log2rawsenz/'
 
     def setUp(self):
-        super(TestSenzCollectorAPI, self).setUp()
+        super(TestLog2RawsenzAPI, self).setUp()
         app.config['TESTING'] = True
         self.app = app.test_client()
 
     def tearDown(self):
-        super(TestSenzCollectorAPI, self).tearDown()
+        super(TestLog2RawsenzAPI, self).tearDown()
         app.config['TESTING'] = False
 
     def test_empty_params(self):
@@ -29,9 +29,8 @@ class TestSenzCollectorAPI(TestCase):
 
     def test_unvalid_params(self):
         rv = self.app.post(self.url, data='OhMyParams')
-        self.assertEqual(400, rv.status_code)
+        self.assertNotEqual(200, rv.status_code)
         result = json.loads(rv.data)
-        self.assertEqual(103, result['code'])
 
         # case 2
         data = {
@@ -43,9 +42,8 @@ class TestSenzCollectorAPI(TestCase):
             }
         }
         rv = self.app.post(self.url, data=json.dumps(data))
-        self.assertEqual(400, rv.status_code)
+        self.assertNotEqual(200, rv.status_code)
         result = json.loads(rv.data)
-        self.assertEqual(103, result['code'])
 
     def test_valid_params(self):
         # case 1
@@ -87,3 +85,212 @@ class TestSenzCollectorAPI(TestCase):
         self.assertEqual(200, rv.status_code)
         result = json.loads(rv.data)
         self.assertEqual(0, result['code'])
+
+
+class TestProb2multiAPI(TestCase):
+    """Test prob2multi workflow
+    """
+    url ='/prob2multi/'
+
+    def setUp(self):
+        app.config['TESTING'] = True
+        self.app = app.test_client()
+
+    def tearDown(self):
+        pass
+
+    def test_empty_params(self):
+        rv = self.app.post(self.url, data='')
+        self.assertEqual(400, rv.status_code)
+        result = json.loads(rv.data)
+        self.assertEqual(103, result['code'])
+
+    def test_unvalid_params(self):
+        rv = self.app.post(self.url, data='OhMyParams')
+        self.assertEqual(400, rv.status_code)
+        result = json.loads(rv.data)
+        self.assertEqual(103, result['code'])
+
+    '''
+    def test_valid_params(self):
+        data = {
+            "probSenzList": [
+                {
+                    "motion": {
+                        "Riding": 0.2457,
+                        "Walking": 0.2863,
+                        "Running": 0.3112,
+                        "Driving": 0.1,
+                        "Sitting": 0.0577
+                    },
+                    "location": {
+                        "restaurant": 0.621,
+                        "resident": 0.379
+                    },
+                    "sound": {
+                        "talk": 0.2342,
+                        "shot": 0.4321,
+                        "sing": 0.3337
+                    },
+                    "timestamp": 1297923712
+                },
+
+                {
+                    "motion": {
+                        "Riding": 0.2457,
+                        "Walking": 0.2863,
+                        "Running": 0.3112,
+                        "Driving": 0.1,
+                        "Sitting": 0.0577
+                    },
+                    "location": {
+                        "restaurant": 0.621,
+                        "resident": 0.379
+                    },
+                    "sound": {
+                        "talk": 0.2342,
+                        "shot": 0.4321,
+                        "sing": 0.3337
+                    },
+                    "timestamp": 1297923712
+                },
+
+                {
+                    "motion": {
+                        "Riding": 0.2457,
+                        "Walking": 0.2863,
+                        "Running": 0.3112,
+                        "Driving": 0.1,
+                        "Sitting": 0.0577
+                    },
+                    "location": {
+                        "restaurant": 0.621,
+                        "resident": 0.379
+                    },
+                    "sound": {
+                        "talk": 0.2342,
+                        "shot": 0.4321,
+                        "sing": 0.3337
+                    },
+                    "timestamp": 1297923712
+                },
+
+                {
+                    "motion": {
+                        "Riding": 0.2457,
+                        "Walking": 0.2863,
+                        "Running": 0.3112,
+                        "Driving": 0.1,
+                        "Sitting": 0.0577
+                    },
+                    "location": {
+                        "restaurant": 0.621,
+                        "resident": 0.379
+                    },
+                    "sound": {
+                        "talk": 0.2342,
+                        "shot": 0.4321,
+                        "sing": 0.3337
+                    },
+                    "timestamp": 1297923712
+                },
+            ],
+            "strategy": "SELECT_MAX_PROB"
+        }
+        rv = self.app.post(self.url, data=json.dumps(data))
+        self.assertEqual(200, rv.status_code)
+        result = json.loads(rv.data)
+        self.assertEqual(0, result['code'])
+    '''
+
+
+    def test_valid_params_quick_version(self):
+        data = {
+            "probSenzList": [
+                {
+                    "motion": {
+                        "Riding": 0.2457,
+                        "Walking": 0.2863,
+                        "Running": 0.3112,
+                        "Driving": 0.1,
+                        "Sitting": 0.0577
+                    },
+                    "location": {
+                        "restaurant": 0.621,
+                        "resident": 0.379
+                    },
+                    "sound": {
+                        "talk": 0.2342,
+                        "shot": 0.4321,
+                        "sing": 0.3337
+                    },
+                    "timestamp": 1297923712
+                },
+
+                {
+                    "motion": {
+                        "Riding": 0.2457,
+                        "Walking": 0.2863,
+                        "Running": 0.3112,
+                        "Driving": 0.1,
+                        "Sitting": 0.0577
+                    },
+                    "location": {
+                        "restaurant": 0.621,
+                        "resident": 0.379
+                    },
+                    "sound": {
+                        "talk": 0.2342,
+                        "shot": 0.4321,
+                        "sing": 0.3337
+                    },
+                    "timestamp": 1297923712
+                },
+
+                {
+                    "motion": {
+                        "Riding": 0.2457,
+                        "Walking": 0.2863,
+                        "Running": 0.3112,
+                        "Driving": 0.1,
+                        "Sitting": 0.0577
+                    },
+                    "location": {
+                        "restaurant": 0.621,
+                        "resident": 0.379
+                    },
+                    "sound": {
+                        "talk": 0.2342,
+                        "shot": 0.4321,
+                        "sing": 0.3337
+                    },
+                    "timestamp": 1297923712
+                },
+
+                {
+                    "motion": {
+                        "Riding": 0.2457,
+                        "Walking": 0.2863,
+                        "Running": 0.3112,
+                        "Driving": 0.1,
+                        "Sitting": 0.0577
+                    },
+                    "location": {
+                        "restaurant": 0.621,
+                        "resident": 0.379
+                    },
+                    "sound": {
+                        "talk": 0.2342,
+                        "shot": 0.4321,
+                        "sing": 0.3337
+                    },
+                    "timestamp": 1297923712
+                }
+            ],
+            "strategy": "SELECT_MAX_N_PROB"
+        }
+        rv = self.app.post(self.url, data=json.dumps(data))
+        self.assertEqual(200, rv.status_code)
+        result = json.loads(rv.data)
+        self.assertEqual(0, result['code'])
+        self.assertEqual(3, len(result['result']))
