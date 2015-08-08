@@ -61,11 +61,8 @@ def init_before_first_request():
 
 @app.route('/log2rawsenz/', methods=['POST'])
 def senzCollectorAPI():
-    if request.headers.has_key('X-Request-Id') and request.headers['X-Request-Id']:
-        x_request_id = request.headers['X-Request-Id']
-    else:
-        x_request_id = ''
 
+    x_request_id = get_X_request_Id(request)
     logger.info('<%s>, [log2rawsenz] request from ip:%s, ua:%s'
                 % (x_request_id, request.remote_addr, request.remote_user))
     result = {'code': 1, 'message': ''}
@@ -103,12 +100,18 @@ def senzCollectorAPI():
     return json.dumps(result)
 
 
-@app.route('/raw2refine/', methods=['POST'])
-def behaviorCollectorAPI():
+def get_X_request_Id(request):
     if request.headers.has_key('X-Request-Id'):
         x_request_id = request.headers['X-Request-Id']
     else:
         x_request_id = ''
+    return x_request_id
+
+
+@app.route('/raw2refine/', methods=['POST'])
+def behaviorCollectorAPI():
+
+    x_request_id = get_X_request_Id(request)
 
     logger.info('<%s>, [raw2refine] request from ip:%s, ua:%s' % (x_request_id, request.remote_addr, request.remote_user))
     result = {'code': 1, 'message': ''}
@@ -141,6 +144,7 @@ def behaviorCollectorAPI():
         result['message'] = 'success'
         logger.info('<%s>, [raw2refine] success!' % (x_request_id))
         return json.dumps(result)
+
     except Exception, e:
         logger.error('<%s>, [raw2refine] [Exception] generate result error: %s' % (x_request_id, str(e)))
         result['code'] = 1
@@ -152,11 +156,7 @@ def behaviorCollectorAPI():
 def senzListConverter():
     result = {'code':1, 'message':''}
 
-    if request.headers.has_key('X-Request-Id'):
-        x_request_id = request.headers['X-Request-Id']
-    else:
-        x_request_id = ''
-
+    x_request_id = get_X_request_Id(request)
     logger.info('<%s>, [prob2multi] request from ip:%s, ua:%s' % (x_request_id, request.remote_addr, request.remote_user))
 
     # params JSON validate

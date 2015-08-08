@@ -341,35 +341,35 @@ def refine_senz_prob_list(scale_type, start_scale_value, end_scale_value, senz_p
 
 if __name__ == '__main__':
     # case 2
-    scale_type = "perMinScale"
+    scale_type = "perHourScale"
     senz_prob_list = [
         {
             "motionProb": {"A": 0.7, "B": 0.3},
             "locationProb": {"A": 0.7, "B": 0.3},
             "timestamp": 21921921213,
-            "perMinScale": 23,
+            "perHourScale": 23,
             "senzId": 11
         },
         {
             "motionProb": {"A": 0.3, "C": 0.7},
             "locationProb": {"A": 0.3, "C": 0.7},
             "timestamp": 11223333,
-            "perMinScale": 24,
+            "perHourScale": 23,
             "senzId": 12
         },
         {
             "motionProb": {"B": 0.7, "C": 0.3},
             "locationProb": {"B": 0.7, "C": 0.3},
             "timestamp": 333222,
-            "perMinScale": 25,
+            "perHourScale": 0,
             "senzId": 21
         },
         {
             "motionProb": {"A": 0.7, "C": 0.3},
             "locationProb": {"A": 0.7, "C": 0.3},
             "timestamp": 992222,
-            "perMinScale": 26,
+            "perHourScale": 2,
             "senzId": 41
         },
     ]
-    print(refine_senz_prob_list(scale_type, 23, 27, senz_prob_list))
+    print(refine_senz_prob_list(scale_type, 23, 2, senz_prob_list))
